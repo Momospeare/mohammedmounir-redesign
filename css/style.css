@@ -1,0 +1,1222 @@
+/* ============================================================
+   Mohammed Mounir — Portfolio v1
+   Theme: GTA 6-inspired (Vice City neon) with readability first.
+   Calm dark base, neon pink/cyan accents, sun-fade hero gradient.
+   No framework. Vanilla CSS.
+   ============================================================ */
+
+:root {
+  /* Base — calm and high-contrast for readability */
+  --bg: #0d0f1c;
+  --bg-2: #141731;
+  --bg-3: #1b1f3d;
+  --ink: #f4f6ff;
+  --ink-soft: #d6dbf5; /* secondary body text (timeline card text, path labels) */
+  --muted: #a9b0d6;
+  --line: rgba(255, 255, 255, 0.09);
+
+  /* Theme-swappable surfaces (dark values = current site) */
+  --nav-bg: rgba(13, 15, 28, 0.82);
+  --map-bg: #0a0c16;
+  --map-attrib-bg: rgba(10, 12, 22, 0.85);
+  --card-media-base: rgba(255, 255, 255, 0.03);
+  --card-media-line: rgba(255, 255, 255, 0.14);
+  --chip-line: rgba(255, 255, 255, 0.2);
+
+  /* Neon accents (Vice City) */
+  --pink: #ff2e88;
+  /* Darker pink reserved for white button text (4.86:1, passes WCAG AA).
+     --pink stays the theme accent; buttons use --pink-btn. */
+  --pink-btn: #d81e6b;
+  --cyan: #2ee6ff;
+  --purple: #8b3bff;
+
+  /* Sun-fade gradient (hero) */
+  --sun-1: #ffb03a;
+  --sun-2: #ff5e62;
+  --sun-3: #8b3bff;
+
+  --radius: 18px;
+  --max-w: 1120px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  /* Display type (editorial reskin, slice 1): Oswald 500-700. Body keeps --font. */
+  --font-display: "Oswald", "Arial Narrow", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------- Light theme — Toronto time, 7am–7pm ET (Nov 8 loop, item 12) ----------
+   Applied by js/theme.js via <html data-theme="light">. The hero keeps its dark
+   sunset banner in both themes (white text on the gradient), so only page
+   surfaces and text colours flip here. Accent --cyan/--pink are darkened so
+   text set in them still passes WCAG AA on light surfaces (cyan #00707f:
+   5.79:1 on white, 4.91:1 on --bg-3; pink #d81e6b: 4.86:1 on white). */
+:root[data-theme="light"] {
+  --bg: #f7f8fc;
+  --bg-2: #ffffff;
+  --bg-3: #e9ecf5;
+  --ink: #141731;
+  --ink-soft: #39415f;
+  --muted: #4d5578;
+  --line: rgba(20, 23, 49, 0.14);
+
+  --nav-bg: rgba(255, 255, 255, 0.88);
+  --map-bg: #e8eef5;
+  --map-attrib-bg: rgba(255, 255, 255, 0.88);
+  --card-media-base: rgba(20, 23, 49, 0.04);
+  --card-media-line: rgba(20, 23, 49, 0.18);
+  --chip-line: rgba(20, 23, 49, 0.25);
+
+  --pink: #d81e6b;
+  --cyan: #00707f;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  /* 390px hardening (Nov 8 loop): no overflow-wrap existed anywhere, so a
+     single long token (e.g. a pasted URL as link text) could push a section
+     past 390px. Breaks long words only when they would otherwise overflow;
+     no visual change to current copy (no long tokens present). */
+  overflow-wrap: break-word;
+}
+
+/* Defence in depth: no page-level horizontal scroll. `clip` (not
+   `hidden`) so `position: sticky` keeps working. */
+html, body { overflow-x: clip; }
+
+img { max-width: 100%; display: block; }
+
+a { color: var(--cyan); }
+
+/* Body links are underlined, not color alone (WCAG 1.4.1).
+   Nav, brand and buttons keep their own styling. */
+main a:not(.btn), footer a, .memo-msg a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Layout helpers ---------- */
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section { padding: 64px 0; }
+/* Anchor jumps clear the 64px sticky nav */
+section[id], footer[id], h2[id] { scroll-margin-top: 80px; }
+/* Focused cards shouldn't hide under the sticky nav either. */
+.info-card, .j-card, .brand { scroll-margin-top: 90px; }
+
+.section-kicker {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cyan);
+  margin: 0 0 12px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  line-height: 1.15;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.section-sub {
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0 0 40px;
+}
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.brand .maple-leaf { width: 0.8em; height: 0.87em; margin-left: 0.06em; vertical-align: -0.1em; fill: var(--pink); }
+.brand .maple-leaf path { fill: var(--pink); }
+
+.nav-links {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 6px 2px;
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+/* ---------- Accessibility ---------- */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 1000;
+  padding: 12px 18px;
+  background: var(--cyan);
+  color: var(--bg);
+  font-weight: 700;
+  border-radius: 8px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 4px;
+}
+section[id] {
+  scroll-margin-top: 90px;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 96px 0 72px;
+  /* Sun-fade: Vice City sunset. Dark overlay baked in for text contrast. */
+  background:
+    linear-gradient(180deg, rgba(13, 15, 28, 0.55) 0%, rgba(13, 15, 28, 0.88) 100%),
+    linear-gradient(120deg, var(--sun-1) 0%, var(--sun-2) 45%, var(--sun-3) 100%);
+}
+
+.hero::after {
+  /* Neon grid horizon — subtle, pure CSS */
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 80px;
+  background:
+    repeating-linear-gradient(90deg, rgba(46, 230, 255, 0.14) 0 2px, transparent 2px 56px),
+    repeating-linear-gradient(0deg, rgba(255, 46, 136, 0.10) 0 2px, transparent 2px 28px);
+  mask-image: linear-gradient(180deg, transparent, #000 70%);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 70%);
+  pointer-events: none;
+}
+
+.hero h1 {
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  line-height: 1.04;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.hero h1 .neon-pink {
+  color: #fff;
+  text-shadow: 0 0 18px var(--pink), 0 0 46px rgba(255, 46, 136, 0.65);
+}
+
+.hero p.lede {
+  font-size: 1.15rem;
+  color: #f0eefc;
+  max-width: 600px;
+  margin: 0 0 32px;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn {
+  display: inline-block;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover { transform: translateY(-2px); }
+
+.btn-primary {
+  background: var(--pink-btn);
+  color: #fff;
+  box-shadow: 0 6px 28px rgba(255, 46, 136, 0.45);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  border-color: var(--muted);
+  backdrop-filter: blur(6px);
+}
+/* Ghost buttons live on the dark hero — they need light text, not --ink */
+.hero .btn-ghost { color: #f0eefc; border-color: rgba(255, 255, 255, 0.45); }
+
+/* ---------- Journey app ---------- */
+/* One linked app: map + progression path + flip cards. Cards are static
+   HTML (indexable); the flip is pure CSS 3D. Experience lives on the
+   card backs now — there is no separate #experience section. */
+#journey-app { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+.j-navigator { margin-bottom: 28px; }
+
+.j-viewport { position: relative; }
+
+.j-track {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 12px 4px 28px;
+  /* Fixed card height so the section doesn't jump (CLS) and the 3D
+     flip has a stable frame; backs scroll internally when long. */
+  min-height: 460px;
+  /* Faint connector line behind cards */
+  background-image: linear-gradient(90deg, var(--line) 0 0);
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  background-position: 0 76px;
+}
+
+.j-track::-webkit-scrollbar { height: 10px; }
+.j-track::-webkit-scrollbar-thumb {
+  background: var(--bg-3);
+  border-radius: 8px;
+}
+.j-track::-webkit-scrollbar-track { background: transparent; }
+
+/* The progression path IS the scroll control: it sits above the cards,
+   spans the full width, and dragging along it scrubs the track. */
+.j-scrubber {
+  margin: 0 0 12px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.j-scrubber.is-dragging { cursor: grabbing; }
+.j-scrubber-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+
+/* Record strip, living inside the journey app (same card language). */
+.j-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 0 0 28px;
+}
+.j-stats-label {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+.j-stat {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  background: linear-gradient(160deg, var(--bg-2), var(--bg-3));
+}
+.j-stat .stat-num { font-size: 2rem; font-weight: 800; color: var(--cyan); margin: 0 0 4px; }
+.j-stat .stat-label { color: var(--muted); font-size: 0.9rem; margin: 0; }
+
+/* Flip scene: perspective on the scene, 3D on the flip wrapper. */
+.j-scene {
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+  perspective: 1200px;
+}
+
+.j-card {
+  position: relative;
+  height: 440px;
+  cursor: pointer;
+  outline: none;
+}
+.j-card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: var(--radius); }
+
+.j-flip {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.2, 0.7, 0.25, 1.12);
+}
+.j-card.is-flipped .j-flip { transform: rotateY(180deg); }
+
+.j-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--bg-2), var(--bg-3));
+}
+.j-card:hover .j-face {
+  border-color: rgba(46, 230, 255, 0.45);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(46, 230, 255, 0.15);
+}
+.j-card.is-selected .j-face {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px var(--cyan), 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+
+.j-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, rgba(255, 46, 136, 0.14), var(--bg-3) 55%);
+  overflow-y: auto;
+}
+.j-back ul { margin: 8px 0 0; padding-left: 18px; }
+.j-back li { color: var(--ink-soft); font-size: 0.9rem; margin-bottom: 8px; }
+.j-back p { color: var(--muted); font-size: 0.93rem; }
+.j-back p a { color: var(--cyan); }
+
+.j-back-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+
+.j-flip-hint {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--pink);
+}
+.j-flip-btn {
+  margin-top: auto;
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.j-flip-btn:hover { border-color: var(--cyan); }
+
+/* Front-face pieces (same vocabulary as the old timeline cards). */
+.t-era {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 14px;
+}
+
+.card-media {
+  height: 120px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 46, 136, 0.16), transparent 60%),
+    radial-gradient(circle at 75% 80%, rgba(46, 230, 255, 0.16), transparent 60%),
+    var(--card-media-base);
+  border: 1px dashed var(--card-media-line);
+  overflow: hidden;
+  transform: translateZ(40px); /* pop toward viewer */
+}
+
+.card-media svg { width: 52px; height: 52px; opacity: 0.9; }
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.j-front h3 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  transform: translateZ(24px);
+}
+
+.t-location {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.j-front p.t-text {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Journey map ---------- */
+.map-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+/* Two-column doors/highlights ONLY in the 721–900px band. The ≤720px
+   single-column rules live in the earlier nav block — and because this
+   block came later in the file, its 2-column rules won at equal
+   specificity on phones too, so the doors rendered 2 cramped columns
+   (~161px each at 390px) that spilled right instead of stacking. The
+   band keeps the two from ever overlapping, so order stops mattering. */
+@media (min-width: 721px) and (max-width: 900px) {
+  #paths .info-grid { grid-template-columns: repeat(2, 1fr); }
+  #recognition .info-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.map-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.map-card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.map-card p { margin: 0 0 14px; color: var(--muted); font-size: 0.9rem; }
+
+#journey-map {
+  height: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--map-bg);
+}
+
+/* Leaflet dark-theme tweaks */
+.leaflet-container { font-family: var(--font); }
+.leaflet-popup-content-wrapper {
+  background: var(--bg-3);
+  color: var(--ink);
+  border-radius: 12px;
+}
+.leaflet-popup-tip { background: var(--bg-3); }
+.leaflet-popup-content { font-size: 0.85rem; line-height: 1.5; }
+.leaflet-control-attribution { font-size: 0.65rem; }
+.leaflet-control-attribution a { color: var(--muted); }
+
+/* Progression path (SVG) — lives in the scrubber above the cards. */
+#progress-path { width: 100%; height: auto; display: block; }
+
+/* Numbered map pins (number baked into the marker, no tooltip clutter) */
+.stop-marker { background: none; border: none; }
+.stop-marker span {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(140deg, var(--pink), var(--cyan));
+  color: #0a0c16; font-weight: 700; font-size: 14px;
+  border: 2px solid #0a0c16;
+  box-shadow: 0 0 0 2px rgba(46, 230, 255, 0.35);
+}
+
+.stop-marker.is-active span {
+  box-shadow: 0 0 0 3px rgba(255, 46, 136, 0.65), 0 0 0 6px rgba(46, 230, 255, 0.35);
+}
+
+/* Cluster badge: same theme treatment, shows the stop count */
+.marker-cluster { background: none; border: none; }
+.marker-cluster span {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(140deg, var(--pink), var(--cyan));
+  color: #0a0c16; font-weight: 700; font-size: 15px;
+  border: 2px solid #0a0c16;
+  box-shadow: 0 0 0 2px rgba(255, 46, 136, 0.4);
+}
+
+/* Attribution readable on dark tiles */
+.leaflet-control-attribution {
+  background: var(--map-attrib-bg) !important;
+  color: var(--muted);
+  padding: 2px 6px;
+}
+
+.pp-node { cursor: pointer; }
+.pp-node circle {
+  fill: var(--bg-3);
+  stroke: var(--cyan);
+  stroke-width: 2;
+  transition: fill 0.15s ease;
+}
+.pp-node:hover circle, .pp-node:focus circle { fill: var(--cyan); }
+.pp-node.is-active circle { fill: var(--pink); stroke: var(--pink); }
+.pp-node.is-active text { fill: var(--ink); font-weight: 700; }
+.pp-node text {
+  fill: var(--ink-soft);
+  font-size: 20px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.pp-node.is-placeholder circle { stroke: var(--pink); stroke-dasharray: 4 3; }
+.pp-track { stroke: var(--line); stroke-width: 3; fill: none; }
+.pp-progress { stroke: url(#ppGradient); stroke-width: 3; fill: none; }
+
+/* ---------- Generic content sections ---------- */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Highlights: 5 cards read better 3+2 than 4+1 */
+#recognition .info-grid { grid-template-columns: repeat(3, 1fr); }
+/* Smaller lifesaver thumbs in Highlights so the CSLA card doesn't tower over the text-only cards */
+#recognition .photo-thumb { width: 120px; }
+#recognition .photo-thumb img { width: 120px; }
+
+.info-card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.info-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.role-meta { font-size: 0.85rem; color: var(--cyan); margin: 0 0 4px; letter-spacing: 0.02em; }
+.info-card p, .info-card li { color: var(--muted); font-size: 0.93rem; }
+.info-card ul { margin: 8px 0 0; padding-left: 18px; }
+
+/* ---------- Choose your path (four doors) ---------- */
+/* Card links are not body links: no underline (beats the line-95 rule,
+   which outranks a bare .door-card on specificity). */
+main a.door-card {
+  display: block;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.door-card:hover {
+  border-color: var(--cyan);
+  transform: translateY(-2px);
+}
+.door-card h3 { color: var(--ink); }
+.door-card .door-proof {
+  margin-top: 12px;
+  color: var(--cyan);
+  font-weight: 600;
+}
+/* Four doors: a true 4-across row (auto-fit at 260px wrapped 3+1) */
+#paths .info-grid { grid-template-columns: repeat(4, 1fr); }
+@media (prefers-reduced-motion: reduce) {
+  .door-card { transition: none; }
+  .door-card:hover { transform: none; }
+}
+
+/* ---------- Contact ---------- */
+#recognition { padding-bottom: 56px; }
+#contact { text-align: left; padding-top: 40px; }
+
+.contact-card {
+  background: linear-gradient(140deg, rgba(255, 46, 136, 0.12), rgba(46, 230, 255, 0.10)), var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 36px;
+  max-width: 100%;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 28px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+/* ---------- Folds: collapsed sections stay in the DOM (SEO-safe) ----------
+   <details> keeps every word indexable while the page reads short.
+   The summary is the one-line promise of what's inside. */
+.fold { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-2); padding: 0 18px; }
+.fold > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 4px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--pink);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+.fold[open] > summary::before { content: "\2013"; }
+.fold > .brands-grid, .fold > .info-grid, .fold > .photo-row { padding: 4px 0 20px; }
+.fold--grid { grid-column: 1 / -1; }
+.fold--grid > .info-grid { padding-top: 4px; }
+
+/* ---------- Scroll-triggered reveals ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.65s ease,
+    transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------- Print: clean one-pager for interviews ---------- */
+@media print {
+  :root, :root[data-theme="light"] {
+    --bg: #fff; --bg-2: #fff; --bg-3: #f2f2f2;
+    --ink: #111; --muted: #444; --line: #bbb;
+  }
+  body { background: #fff; }
+  .nav, .skip-link, #journey-app .j-navigator, #journey-app .j-scrubber, .hero .cta-row,
+  .contact-card, footer, .memo-widget, .to-top { display: none !important; }
+  section { padding: 18px 0; }
+  /* Journey app becomes a 2-column grid so all 8 cards print, fronts
+     and backs stacked (both faces visible on paper). */
+  #journey-track {
+    display: grid; grid-template-columns: 1fr 1fr;
+    overflow: visible; gap: 12px;
+  }
+  .j-scene { min-width: 0; }
+  .j-card { height: auto; }
+  .j-flip { transform: none !important; }
+  .j-face { position: static; backface-visibility: visible; -webkit-backface-visibility: visible; }
+  .j-back { transform: none; }
+  /* Reveals must not hide content on paper */
+  .reveal { opacity: 1 !important; transform: none !important; }
+  a { color: #111; }
+}
+
+/* ---------- Motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .j-flip { transition: none; }
+  .btn { transition: none; }
+}
+
+/* ---------- Utilities ---------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ---------- Testimonials ---------- */
+.testimonial { margin: 0; }
+.testimonial p { font-size: 1.02rem; }
+.testimonial footer { margin-top: 14px; color: var(--muted); font-size: 0.9rem; }
+.testimonial footer strong { color: var(--ink); }
+
+/* ---------- Case study pages ---------- */
+.case { max-width: 720px; }
+.case h2 { margin-top: 36px; }
+.case .result {
+  border-left: 3px solid var(--cyan);
+  padding: 4px 0 4px 16px;
+  font-size: 1.1rem;
+}
+.case .pager { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+.case .pager a { color: var(--muted); text-decoration: none; font-weight: 600; }
+.case .pager a:hover { color: var(--ink); }
+@media (max-width: 720px) { .case .pager { flex-direction: column; gap: 6px; } }
+
+/* ---------- Memo chatbot (scripted sidekick) ----------
+   Client-side only: canned answers, nothing leaves the browser. */
+.memo-widget {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 200;
+  font-size: 0.92rem;
+}
+
+.memo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--cyan);
+  background: var(--bg-3);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.memo-toggle:hover { border-color: var(--cyan); }
+
+.memo-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--pink), var(--cyan));
+}
+
+.memo-panel {
+  position: absolute;
+  right: 0;
+  bottom: 64px;
+  width: min(340px, calc(100vw - 40px));
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-2);
+  border: 1px solid var(--cyan);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.memo-panel[hidden] { display: none; }
+
+.memo-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 16px;
+  background: linear-gradient(140deg, rgba(255, 46, 136, 0.16), rgba(46, 230, 255, 0.12));
+  border-bottom: 1px solid var(--line);
+}
+
+.memo-header strong { font-size: 1rem; }
+.memo-header span { color: var(--muted); font-size: 0.78rem; flex: 1; }
+
+.memo-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 8px 10px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.memo-close:hover { color: var(--ink); }
+
+.memo-messages {
+  max-height: 300px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memo-msg {
+  max-width: 92%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  line-height: 1.5;
+}
+
+.memo-msg.memo {
+  align-self: flex-start;
+  background: var(--bg-3);
+  color: var(--ink);
+  border-bottom-left-radius: 4px;
+}
+
+.memo-msg.user {
+  align-self: flex-end;
+  background: var(--pink-btn);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.memo-msg a { color: var(--cyan); }
+
+.memo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.memo-chip {
+  padding: 11px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--chip-line);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.memo-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.memo-form {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.memo-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--chip-line);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.92rem;
+}
+
+.memo-input::placeholder { color: var(--muted); }
+
+.memo-send {
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--pink-btn);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ---------- About ---------- */
+#about { padding-bottom: 40px; }
+.about-copy { max-width: 720px; }
+.about-copy p { color: var(--muted); font-size: 1.05rem; }
+.about-copy p strong { color: var(--ink); }
+
+/* Slim "latest writing" strip at the bottom of About. */
+.about-strip {
+  border-top: 1px solid var(--line);
+  margin-top: 28px;
+  padding-top: 20px;
+}
+.about-strip p { color: var(--muted); margin: 0; }
+
+/* "What people say" row inside Projects. */
+.project-quotes-title { margin: 32px 0 4px; font-size: 1.15rem; }
+
+/* ---------- Back to top ---------- */
+.to-top {
+  position: fixed;
+  right: 20px;
+  bottom: 88px; /* clears the Memo toggle below it */
+  z-index: 190;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  background: var(--bg-3);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.to-top.is-visible { opacity: 1; pointer-events: auto; visibility: visible; }
+/* A keyboard user tabbing onto the button must see it, even before JS marks it visible. */
+.to-top:focus-visible { opacity: 1; pointer-events: auto; visibility: visible; }
+.to-top:hover { border-color: var(--cyan); }
+/* While Memo is open it covers the back-to-top button; hide the button
+   (and drop it from the tab order) until the panel closes. */
+body.memo-open .to-top { display: none !important; }
+
+/* ---------- Brands ---------- */
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+main a.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 132px;
+  padding: 18px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.brand:hover, .brand:focus-visible { border-color: var(--cyan); transform: translateY(-2px); }
+/* Logos fit their tile: max-width is a percentage of the tile, not a fixed
+   pixel box. The old 160px/200px caps overflowed the tile (tile content is
+   ~143px desktop, ~140px at 390px): Zehrs/Rogers boxes were 200px wide,
+   VELD/Vaughan chips 202px — the marks poked out of their tiles and over
+   the neighbouring tile. object-fit: contain letterboxes the mark, so
+   nothing distorts; wide marks just render a touch smaller. */
+.brand-logo {
+  height: 52px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+/* Square/icon marks read small at the base height — give them more presence */
+.brand-logo--mark { height: 64px; max-width: 96px; }
+/* The widest wordmarks (Zehrs, Rogers) get more width so they don't render as a thin strip */
+/* Logo chips: fixed dark/light plates so white-only marks (VELD, ASP) and
+   dark-only marks (Festa, Vaughan, WLKN) stay legible in both themes. */
+.brand-chip { display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+.brand-chip img { max-width: 100%; }
+.brand-chip--dark { background: #0d0f1c; }
+.brand-chip--light { background: #fff; }
+.brand-logo--wide { max-width: 100%; }
+.brand-name { font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+.brand-wordmark { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); }
+.brand-cap { font-size: 0.8rem; color: var(--muted); }
+
+/* Floating brands: a logo-only marquee. The folded grid below stays as
+   the accessible, SEO-readable version of the same list. */
+.brands-marquee {
+  overflow: hidden;
+  margin: 0 0 20px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.brands-marquee-track {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  width: max-content;
+}
+.brands-marquee-track.is-looping { animation: brands-drift 70s linear infinite; }
+.brands-marquee:hover .brands-marquee-track,
+.brands-marquee:focus-within .brands-marquee-track,
+.brands-marquee-track.is-paused { animation-play-state: paused; }
+@keyframes brands-drift { to { transform: translateX(-50%); } }
+.brand-float {
+  background: none;
+  border: 0;
+  padding: 6px 0;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.brand-float:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 6px; }
+.brand-float img.brand-logo { height: 42px; width: auto; max-width: 150px; object-fit: contain; display: block; }
+.brand-float .brand-wordmark { font-size: 1.05rem; white-space: nowrap; }
+.brand-dialog {
+  background: var(--bg-3);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: min(420px, calc(100vw - 40px));
+}
+.brand-dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+.brand-dialog h3 { margin: 0 0 6px; padding-right: 32px; }
+.brand-dialog p { margin: 0 0 14px; color: var(--muted); }
+.brand-dialog p:last-child { margin-bottom: 0; }
+.brand-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brands-marquee-track.is-looping { animation: none; }
+  .brands-marquee { overflow-x: auto; }
+}
+
+/* Police services strip (Nov 9, 2026) — services worked with / reported to, not employers */
+.police-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.police-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 150px;
+  padding: 18px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  text-align: center;
+}
+.police-item img { height: 56px; width: auto; max-width: 160px; object-fit: contain; }
+.police-name { font-weight: 600; font-size: 0.95rem; color: var(--ink); }
+.police-role { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+
+/* LinkedIn photo thumbnails (Nov 8, 2026) — small 160px thumbs; full-size originals pending */
+.photo-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+.photo-thumb { margin: 0; width: 160px; }
+.photo-thumb img { display: block; width: 160px; height: auto; border-radius: 8px; }
+.photo-thumb figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+/* Full-size originals from Google Photos (Nov 8, 2026) — displayed at 260px, natural aspect ratio */
+.photo-med { margin: 0; width: min(260px, 100%); }
+.photo-med img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.photo-med figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+.photo-credit { font-size: 0.8rem; color: var(--muted); margin-top: 16px; }
+.award-logo { margin: 16px 0 0; }
+.award-logo img { display: block; height: auto; }
+.award-logo--ospa a { display: inline-block; background: #fff; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; }
+.award-logo--ospa img { width: 240px; }
+.award-logo--square img { width: 120px; }
+.award-logo figcaption { font-size: 0.8rem; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+/* ---------- Mobile (max-width: 720px) ----------
+   This block MUST stay after all base rules in this file. Equal
+   specificity means the last matching rule wins: when it sat up in the
+   nav section, later base rules overrode it on phones — the doors got
+   the 4-column base instead of stacking (Highlights got 3), and the
+   hero/contact-card kept desktop padding. Base first, queries last. */
+@media (max-width: 720px) {
+  .nav-inner {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 12px;
+  }
+  .nav-links {
+    display: flex;
+    width: 100%;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 0 0 12px;
+    scrollbar-width: thin;
+    /* Right-edge fade: signals the nav scrolls. Removed by JS once the
+       visitor reaches the end (see .at-end below). */
+    -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent 100%);
+    mask-image: linear-gradient(90deg, #000 88%, transparent 100%);
+  }
+  .nav-links.at-end {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .nav-links li {
+    flex: 0 0 auto;
+  }
+  .nav-links a {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 12px 2px;
+  }
+  /* Mobile: doors stack, hero and sections breathe less */
+  #paths .info-grid { grid-template-columns: 1fr; }
+  #recognition .info-grid { grid-template-columns: 1fr; }
+  .hero { padding: 72px 0 64px; }
+  section { padding: 44px 0; }
+  /* The stacked nav is ~105px tall at 390px, so anchors need more room. */
+  section[id], footer[id], h2[id] { scroll-margin-top: 112px; }
+  .contact-card { padding: 24px 20px; }
+  /* Journey app on phones: near-full-width flip cards, taller frame */
+  .j-scene { flex: 0 0 86vw; }
+  .j-card { height: 470px; }
+  .j-stats { grid-template-columns: repeat(2, 1fr); }
+  .fold { padding: 0 14px; }
+}
