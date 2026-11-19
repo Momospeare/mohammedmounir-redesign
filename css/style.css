@@ -241,11 +241,39 @@ section[id] {
   color: #fff;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2.4rem, 6vw, 4.2rem);
-  line-height: 1.04;
+  text-transform: uppercase;
+  font-size: clamp(2.1rem, 5.5vw, 4rem);
+  line-height: 1.05;
   margin: 0 0 16px;
   letter-spacing: -0.02em;
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Magazine-cover hero (slice 2): stacked headline lines + cutout figure.
+   The hero keeps its dark sunset banner in both themes, so the
+   transparent cutout reads on light and dark alike. */
+.hero-line { display: block; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 48px;
+  align-items: end;
+}
+
+.hero-figure {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+/* Height-driven to keep the tall full-body aspect; width follows. */
+.hero-figure img {
+  height: clamp(420px, 48vw, 600px);
+  width: auto;
+  max-width: 100%;
 }
 
 .hero h1 .neon-pink {
@@ -521,7 +549,8 @@ section[id] {
    (~161px each at 390px) that spilled right instead of stacking. The
    band keeps the two from ever overlapping, so order stops mattering. */
 @media (min-width: 721px) and (max-width: 900px) {
-  #paths .info-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Doors stay a single-column TOC list here too (slice 2). */
+  #paths .info-grid { grid-template-columns: 1fr; }
   #recognition .info-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -653,8 +682,38 @@ main a.door-card {
   color: var(--cyan);
   font-weight: 600;
 }
-/* Four doors: a true 4-across row (auto-fit at 260px wrapped 3+1) */
-#paths .info-grid { grid-template-columns: repeat(4, 1fr); }
+/* Doors as a table of contents (slice 2): numbered rows with rules,
+   not cards. One column at every width. */
+#paths .info-grid { grid-template-columns: 1fr; gap: 0; }
+#paths .door-card {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 22px 4px;
+}
+#paths .door-card:first-child { border-top: 1px solid var(--line); }
+#paths .door-card:hover { transform: none; border-bottom-color: var(--cyan); }
+.door-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--pink);
+  letter-spacing: 0.06em;
+  flex: 0 0 auto;
+}
+.door-body { min-width: 0; }
+.door-body h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+}
+.door-card .door-proof { margin-top: 8px; }
 @media (prefers-reduced-motion: reduce) {
   .door-card { transition: none; }
   .door-card:hover { transform: none; }
@@ -1210,6 +1269,9 @@ main a.brand {
   #paths .info-grid { grid-template-columns: 1fr; }
   #recognition .info-grid { grid-template-columns: 1fr; }
   .hero { padding: 72px 0 64px; }
+  /* Magazine hero stacks on phones: headline first, figure below (slice 2). */
+  .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+  #paths .door-card { padding: 18px 2px; gap: 14px; }
   section { padding: 44px 0; }
   /* The stacked nav is ~105px tall at 390px, so anchors need more room. */
   section[id], footer[id], h2[id] { scroll-margin-top: 112px; }
