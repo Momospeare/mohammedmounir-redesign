@@ -375,6 +375,16 @@ section[id] {
    page like a magazine chapter, and the kicker carries the section number
    in the same pink Oswald voice as the doors' 01–04. */
 #journey-app { border-top: 3px solid var(--pink); }
+/* Editorial chapter rules: every numbered section opens with the same
+   pink rule — About 06, brands 07, Projects 08, Recognition 09 on the
+   homepage; the Momospeare and gear pages reuse the same voice for
+   their own sequences. */
+#about, #brands, #projects, #recognition { border-top: 3px solid var(--pink); }
+#channel, #streaming, #track-days, #car-meetups, #business-contact { border-top: 3px solid var(--pink); }
+section[aria-labelledby="gear-title"],
+section[aria-labelledby="save-title"],
+section[aria-labelledby="giveaway-title"],
+section[aria-labelledby="short-title"] { border-top: 3px solid var(--pink); }
 .section-kicker .section-num {
   font-family: var(--font-display);
   font-weight: 600;
@@ -1055,7 +1065,7 @@ footer .wrap {
 /* ---------- About ---------- */
 #about { padding-bottom: 40px; }
 .about-copy { max-width: 720px; }
-.about-copy p { color: var(--muted); font-size: 1.05rem; }
+.about-copy p { color: var(--muted); font-size: 1.05rem; margin: 0 0 18px; }
 .about-copy p strong { color: var(--ink); }
 
 /* Slim "latest writing" strip at the bottom of About. */
@@ -1068,6 +1078,16 @@ footer .wrap {
 
 /* "What people say" row inside Projects. */
 .project-quotes-title { margin: 32px 0 4px; font-size: 1.15rem; }
+
+/* Projects as magazine entries: ruled, not boxed — the same voice as the
+   stats spread. Scoped to #projects so Recognition cards keep their boxes. */
+#projects .info-card {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 20px 0 4px;
+}
 
 /* ---------- Back to top ---------- */
 .to-top {
