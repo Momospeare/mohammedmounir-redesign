@@ -168,7 +168,9 @@ section[id], footer[id], h2[id] { scroll-margin-top: 80px; }
   letter-spacing: 0.01em;
 }
 
-.brand .maple-leaf { width: 0.8em; height: 0.87em; margin-left: 0.06em; vertical-align: -0.1em; fill: var(--pink); }
+.brand .maple-leaf { display: inline-block; width: 0.8em; height: 0.87em; margin-left: 0.06em; vertical-align: -0.1em; fill: var(--pink); }
+/* Nav brand stays on one line so the leaf sits beside the name, not under it. */
+.nav-inner .brand { white-space: nowrap; }
 .brand .maple-leaf path { fill: var(--pink); }
 
 .nav-links {
