@@ -371,30 +371,53 @@ section[id] {
   margin: 0 0 8px;
 }
 
-/* Record strip, living inside the journey app (same card language). */
+/* Editorial wrapper: the journey is chapter 05 — a pink rule breaks the
+   page like a magazine chapter, and the kicker carries the section number
+   in the same pink Oswald voice as the doors' 01–04. */
+#journey-app { border-top: 3px solid var(--pink); }
+.section-kicker .section-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--pink);
+  letter-spacing: 0.06em;
+  margin-right: 10px;
+}
+
+/* Proof spread, living inside the journey app — a magazine stats grid, not
+   a card strip: ruled cells, large Oswald numbers, no boxes. */
 .j-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin: 0 0 28px;
+  column-gap: 28px;
+  row-gap: 32px;
+  margin: 0 0 40px;
 }
 .j-stats-label {
   grid-column: 1 / -1;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--pink);
   margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
 }
 .j-stat {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 18px;
-  background: linear-gradient(160deg, var(--bg-2), var(--bg-3));
+  border-top: 1px solid var(--line);
+  padding: 18px 0 0;
 }
-.j-stat .stat-num { font-size: 2rem; font-weight: 800; color: var(--cyan); margin: 0 0 4px; }
-.j-stat .stat-label { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.j-stat .stat-num {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  line-height: 1;
+  color: var(--pink);
+  margin: 0 0 8px;
+}
+.j-stat .stat-label { color: var(--muted); font-size: 0.95rem; line-height: 1.45; margin: 0; }
 
 /* Flip scene: perspective on the scene, 3D on the flip wrapper. */
 .j-scene {
@@ -1281,6 +1304,6 @@ main a.brand {
   /* Journey app on phones: near-full-width flip cards, taller frame */
   .j-scene { flex: 0 0 86vw; }
   .j-card { height: 470px; }
-  .j-stats { grid-template-columns: repeat(2, 1fr); }
+  .j-stats { grid-template-columns: repeat(2, 1fr); column-gap: 20px; row-gap: 28px; }
   .fold { padding: 0 14px; }
 }
