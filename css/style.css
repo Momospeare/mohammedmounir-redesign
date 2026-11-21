@@ -249,19 +249,21 @@ section[id] {
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
 }
 
-/* Magazine-cover hero (slice 2): stacked headline lines + cutout figure.
-   The hero keeps its dark sunset banner in both themes, so the
-   transparent cutout reads on light and dark alike. */
+/* Stacked headline lines (Oswald). The portfolio hero is single-column
+   copy now — the jumpsuit cutout moved to the Momospeare hero below. */
 .hero-line { display: block; }
 
-.hero-grid {
+/* Momospeare hero (creator side): the jumpsuit cutout lives here.
+   Two-column grid on desktop, stacks on phones. The transparent
+   cutout reads on both the light and dark theme. */
+.momo-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
   gap: 48px;
   align-items: end;
 }
 
-.hero-figure {
+.momo-hero-figure {
   position: relative;
   z-index: 1;
   margin: 0;
@@ -270,7 +272,7 @@ section[id] {
   align-items: flex-end;
 }
 /* Height-driven to keep the tall full-body aspect; width follows. */
-.hero-figure img {
+.momo-hero-figure img {
   height: clamp(420px, 48vw, 600px);
   width: auto;
   max-width: 100%;
@@ -1269,8 +1271,8 @@ main a.brand {
   #paths .info-grid { grid-template-columns: 1fr; }
   #recognition .info-grid { grid-template-columns: 1fr; }
   .hero { padding: 72px 0 64px; }
-  /* Magazine hero stacks on phones: headline first, figure below (slice 2). */
-  .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+  /* Momospeare hero stacks on phones: copy first, figure below. */
+  .momo-hero-grid { grid-template-columns: 1fr; gap: 28px; }
   #paths .door-card { padding: 18px 2px; gap: 14px; }
   section { padding: 44px 0; }
   /* The stacked nav is ~105px tall at 390px, so anchors need more room. */
